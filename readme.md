@@ -69,62 +69,62 @@ Agora's main purpose is to aggregate data for video player streaming events and 
 ### Event Types
 Currently Agora is set up to listen for these event types:
 
-**MediaStarted** – trigger this event anytime a user hits the play button on a video (could be multiple times per video if they are pausing the video and then continuing watching).
+* MediaStarted – trigger this event anytime a user hits the play button on a video (could be multiple times per video if they are pausing the video and then continuing watching).
 
-**MediaEnded** – trigger this event anytime a user hits the pause button (could also be multiple times per video).
+* MediaEnded – trigger this event anytime a user hits the pause button (could also be multiple times per video).
 
-**MediaCompleted** - trigger this event anytime a user completely finished watching a video.
+* MediaCompleted - trigger this event anytime a user completely finished watching a video.
 
-**MediaFailed** – trigger this event anytime the video fails to work. 
+* MediaFailed – trigger this event anytime the video fails to work. 
 
-**MediaInitialBufferStart** – trigger this event when the video player starts the initial buffering.
+* MediaInitialBufferStart – trigger this event when the video player starts the initial buffering.
 
-**MediaInitialBufferEnd** – trigger this event when the video player starts playing after the initial buffering event.
+* MediaInitialBufferEnd – trigger this event when the video player starts playing after the initial buffering event.
 
-**MediaBufferingStart** – trigger this event anytime the video player experiences a buffering issue.
+* MediaBufferingStart – trigger this event anytime the video player experiences a buffering issue.
 
-**MediaBufferingEnd** – trigger this event anytime the video begins playing again after a buffering event.
+* MediaBufferingEnd – trigger this event anytime the video begins playing again after a buffering event.
 
-**MediaScrub** – trigger this event after a user has started and then completed a scrub/seek to a different time location in the video.
+* MediaScrub – trigger this event after a user has started and then completed a scrub/seek to a different time location in the video.
 
 ### Custom Fields
 Currently Agora is set up to aggregate these custom fields:
 
-**x_useragent**: the user agent where the video is playing
+* x_useragent: the user agent where the video is playing
 
-**x_tpmid**: video ID ***REQUIRED***
+* x_tpmid: video ID ***REQUIRED***
 
-**x_episode_title**: video title
+* x_episode_title: video title
 
-**x_program_title**: program slug
+* x_program_title: program slug
 
-**x_producer**:  call letters of the producer of the video
+* x_producer:  call letters of the producer of the video
 
-**x_video_length**: video duration
+* x_video_length: video duration
 
-**x_client_id**: unique number identifying the current client (unique per browser/device)
+* x_client_id: unique number identifying the current client (unique per browser/device)
 
-**x_session_id**: unique number identifying the current session (unique per client session)
+* x_session_id: unique number identifying the current session (unique per client session)
 
-**x_tracking_id**: unique number identifying distinct requests for an individual video (unique per single video watching session) ***REQUIRED***
+* x_tracking_id: unique number identifying distinct requests for an individual video (unique per single video watching session) ***REQUIRED***
 
-**x_video_location**: the time location within the video when the event was triggered (in seconds)
+* x_video_location: the time location within the video when the event was triggered (in seconds)
 
-**x_stream_size**: the current HLS stream being played (ie. 1172, 391, etc..)
+* x_stream_size: the current HLS stream being played (ie. 1172, 391, etc..)
 
-**x_flash_player**: identifies if the user has flash enabled
+* x_flash_player: identifies if the user has flash enabled
 
-**x_buffering_length**: the current HLS buffer size in milliseconds
+* x_buffering_length: the current HLS buffer size in milliseconds
 
-**x_encoding_name**: video encoding type
+* x_encoding_name: video encoding type
 
-**x_auto**: the video quality setting
+* x_auto: the video quality setting
 
-**x_bandwidth**: the user’s bandwidth
+* x_bandwidth: the user’s bandwidth
 
-**x_after_seek**: identifies if the event was triggered after a seek
+* x_after_seek: identifies if the event was triggered after a seek
 
-**x_start_time**: the video’s start time in milliseconds
+* x_start_time: the video’s start time in milliseconds
 
 ### Sample Data
 Agora takes in a text file of logs that are broken into lines where each line represents a video player event and consists of a date timestamp and key-value event data pairs. here is what a sample line might look like:
