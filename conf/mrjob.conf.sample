@@ -1,0 +1,24 @@
+{
+    "runners": {
+        "emr" : {
+            "aws_region" : "us-east-1",
+            "aws_access_key_id": "<Key>",
+            "aws_secret_access_key": "<secret>",
+            "visible_to_all_users" : True,
+            "ec2_key_pair": "EMR",
+            "ec2_key_pair_file": "path/to/file/EMR.pem",
+            "ssh_tunnel_to_job_tracker": true,
+            "s3_log_uri" : "s3://bucket/key/jobs/logs/",
+            "s3_scratch_uri": "s3://bucket/key/jobs/",
+            "max_hours_idle" : "0",
+            "mins_to_end_of_hour" : "10",
+	    ec2_instance_type: c1.medium,
+	    num_ec2_instances: <number>,
+            "bootstrap_cmds": [
+                "sudo easy_install pip",
+                "sudo pip install python-dateutil",
+                "sudo pip install --upgrade simplejson"
+            ]
+        }
+    }
+}

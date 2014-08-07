@@ -1,0 +1,9 @@
+*.pyc
+.coverage
+.tox/
+__pycache__/
+agora.egg-info/
+agora.tar.gz
+dev/.vagrant/
+run_agora.sh
+conf/mrjob_daily.conf
