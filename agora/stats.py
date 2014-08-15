@@ -3,6 +3,7 @@ from dateutil.parser import parse
 
 class PBSVideoStats(object):
 
+    # These are the only events that are parsed for playing duration
     MEDIA_START_EVENTS = ['MediaStarted', 'MediaInitialBufferStart']
     MEDIA_ENDED_EVENTS = ['MediaEnded', 'MediaCompleted']
     MEDIA_EVENTS = MEDIA_START_EVENTS + MEDIA_ENDED_EVENTS
@@ -18,7 +19,7 @@ class PBSVideoStats(object):
         self.earliest_time = None
         self.latest_time = None
 
-        # Wether a stream was completed or not
+        # Whether a stream was completed or not
         self.incomplete_stream = None
         self.finished_playback = False
 
@@ -33,7 +34,7 @@ class PBSVideoStats(object):
 
         self.source = None
         self.component = None
-        self.auto_bitrate = 'null'
+        self.auto_bitrate = None
         self.client_id = None
         self.title = None
         self.session_id = None
@@ -60,6 +61,7 @@ class PBSVideoStats(object):
         etype = None
         edate = None
 
+        # TODO: check if current event's values are the same
         # set the following values only once per event
         if not self.source and event.get('source_tag'):
             self.source = event['source_tag']
@@ -163,6 +165,7 @@ class PBSVideoStats(object):
             return True
 
         try:
+            # TODO: truncate floating to int
             # Events should not have negative buffering_length
             if int(event.get('x_buffering_length', 0)) < 0:
                 print 'Negative Buffering'

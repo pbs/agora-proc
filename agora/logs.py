@@ -27,6 +27,7 @@ class GoonHillyLog(object):
         try:
             discard, data = rline.split('] ', 1)
         except:
+            # TODO: raise custom error?
             print line
             print '\n\n'
             print rline
