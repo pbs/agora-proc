@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 from codecs import open
 from os import path
 
@@ -16,11 +16,12 @@ setup(
     version=agora.__version__,
     description='Batch analyze video stream logs',
     long_description=long_description,
-    url='https://projects.pbs.org/stash/projects/UTILS/repos/agora/browse',
+    url='https://github.com/pbs/agora-proc',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ],
     keywords='agora mrjob mapreduce',
