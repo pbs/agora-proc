@@ -10,7 +10,6 @@ HERE = path.abspath(path.dirname(__file__))
 
 
 class PBSVideoStatsTestcase(unittest.TestCase):
-
     """
     Test agora.stats.PBSVideoStats
     """
