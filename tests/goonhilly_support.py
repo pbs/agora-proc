@@ -34,7 +34,8 @@ def print_results(events, custom_fields, source_tag):
     """
     print '\nSOURCE: %s' % source_tag
     print '============================'
-    for key in events.iterkeys():
+    sorted_event_keys = sorted(events.iterkeys())
+    for key in sorted_event_keys:
         if events[key] > 0:
             result = hilite(str(events[key]), True, True)
         else:
@@ -43,7 +44,8 @@ def print_results(events, custom_fields, source_tag):
         print '%-40s:\t%s' % (key, result)
 
     print ''
-    for key in custom_fields.iterkeys():
+    sorted_custom_field_keys = sorted(custom_fields.iterkeys())
+    for key in sorted_custom_field_keys:
         if custom_fields[key] > 0:
             result = hilite(str(custom_fields[key]), True, True)
         else:
@@ -59,6 +61,7 @@ def test_support(file_list, source_tag):
         'MediaCompleted': 0,
         'MediaFailed': 0,
         'MediaQualityChange': 0,
+        'MediaQualityChangeAuto': 0,
         'MediaQualityChangeProgramatically': 0,
         'MediaInitialBufferStart': 0,
         'MediaInitialBufferEnd': 0,
@@ -85,7 +88,9 @@ def test_support(file_list, source_tag):
         'x_auto': 0,
         'x_bandwidth': 0,
         'x_after_seek': 0,
-        'x_start_time': 0
+        'x_start_time': 0,
+        'x_previous_quality': 0,
+        'x_new_quality': 0
     }
 
     # Iterate over passed in files
