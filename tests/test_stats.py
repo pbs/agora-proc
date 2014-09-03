@@ -165,3 +165,33 @@ class PBSVideoStatsTestcase(unittest.TestCase):
                 if count + 1 < len(results):
                     self.assertTrue(
                         edata.get('edate') <= results[count + 1].get('edate'))
+
+    def test_media_quality_change_auto(self):
+        """
+        Test that we're tallying MediaQualityChangeAuto events
+        """
+        for key, events in self.events.items():
+            stats = PBSVideoStats()
+            auto_bitrate_events = 0
+            for event in events:
+                stats.add_event(event)
+                if event.get('event_type') == 'MediaQualityChangeAuto':
+                    auto_bitrate_events += 1
+            results = stats.summary()
+            self.assertEqual(
+                results.get('auto_bitrate_events'), auto_bitrate_events)
+
+    def test_media_quality_change_user(self):
+        """
+        Test that we're tallying MediaQualityChange events
+        """
+        for key, events in self.events.items():
+            stats = PBSVideoStats()
+            user_bitrate_events = 0
+            for event in events:
+                stats.add_event(event)
+                if event.get('event_type') == 'MediaQualityChange':
+                    user_bitrate_events += 1
+            results = stats.summary()
+            self.assertEqual(
+                results.get('user_bitrate_events'), user_bitrate_events)

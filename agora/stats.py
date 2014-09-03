@@ -42,6 +42,10 @@ class PBSVideoStats(object):
         self.position_earliest_play = None
         self.position_latest_play = None
         self.duration_events = []
+        # track bitrate changes automatically made by the video player
+        self.auto_bitrate_events = 0
+        # track bitrate changes manually made by the user
+        self.user_bitrate_events = 0
 
         # Keeps track of number of buffering events/video location
         # of the events
@@ -121,8 +125,8 @@ class PBSVideoStats(object):
                 self._addEventMediaScrub(event)
             elif etype == "MediaQualityChangedProgrammatically":
                 self._addEventMediaQualityChangedProgrammatically(event)
-            elif etype == "MediaQualityChanged":
-                self._addEventMediaQualityChanged(event)
+            elif etype == "MediaQualityChange":
+                self._addEventMediaQualityChange(event)
 
         # if event is a media start/end event and has a date timestamp,
         # save event to calculate playing_duration later
@@ -151,6 +155,8 @@ class PBSVideoStats(object):
         r['buffering_events'] = self.buffering_events
         r['buffering_length'] = self.buffering_length
         r['initial_buffering_length'] = self.initial_buffering_length
+        r['auto_bitrate_events'] = self.auto_bitrate_events
+        r['user_bitrate_events'] = self.user_bitrate_events
         return r
 
     def _contains_bad_data(self, event):
@@ -248,7 +254,7 @@ class PBSVideoStats(object):
         self.initial_buffering_length += int(event.get('x_buffering_length', 0))
 
     def _addEventMediaQualityChangeAuto(self, event):
-        return
+        self.auto_bitrate_events += 1
 
     def _addEventMediaScrub(self, event):
         return
@@ -256,8 +262,8 @@ class PBSVideoStats(object):
     def _addEventMediaQualityChangedProgrammatically(self, event):
         return
 
-    def _addEventMediaQualityChanged(self, event):
-        return
+    def _addEventMediaQualityChange(self, event):
+        self.user_bitrate_events += 1
 
     def _add_duration_event(self, etype, edate):
         # append dictionary of event type and timestamp
