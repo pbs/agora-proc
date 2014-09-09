@@ -13,7 +13,7 @@ clean:
 	find . -name "*.swp" -print0 | xargs -0 rm -f
 
 tar: clean
-	tar -czf agora.tar.gz readme.md setup.py setup.cfg MANIFEST.in ./agora
+	tar -czf agora.tar.gz readme.md setup.py setup.cfg MANIFEST.in requirements.txt ./agora
 
 test:
 	py.test --capture=no
