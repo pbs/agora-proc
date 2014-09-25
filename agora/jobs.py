@@ -1,4 +1,5 @@
 import logging
+import GeoIP
 
 from mrjob.job import MRJob
 
@@ -9,8 +10,27 @@ from agora.stats import PBSVideoStats
 class VideoStreamCondense(MRJob):
 
     def __init__(self, args=None):
+        self.isp_lookup = None
         super(VideoStreamCondense, self).__init__(args=args)
         self.logger = logging.getLogger('mrjob')
+
+    def configure_options(self):
+        """
+        Add custom command line options.
+        """
+        super(VideoStreamCondense, self).configure_options()
+        self.add_file_option(
+            '--isp_db', help='Optional: path to ISP-lookup database')
+
+    def load_options(self, args):
+        """
+        Load command-line options into self.options.
+        https://pythonhosted.org/mrjob/job.html?highlight=configure_options#mrjob.job.MRJob.load_options
+        """
+        super(VideoStreamCondense, self).load_options(args)
+        if self.options.isp_db:
+            self.isp_lookup = GeoIP.open(
+                self.options.isp_db, GeoIP.GEOIP_STANDARD)
 
     def mapper(self, _, line):
         '''
@@ -48,7 +68,7 @@ class VideoStreamCondense(MRJob):
         self.increment_counter('event-metrics', 'total-streams', 1)
 
         # aggregate all events in a stream
-        stats = PBSVideoStats()
+        stats = PBSVideoStats(self.isp_lookup)
         for event in events:
             stats.add_event(event)
 
