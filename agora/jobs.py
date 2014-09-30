@@ -1,10 +1,9 @@
 import logging
-import GeoIP
 
-from mrjob.job import MRJob
-
+import pygeoip
 from agora.logs import GoonHillyLog
 from agora.stats import PBSVideoStats
+from mrjob.job import MRJob
 
 
 class VideoStreamCondense(MRJob):
@@ -29,8 +28,8 @@ class VideoStreamCondense(MRJob):
         """
         super(VideoStreamCondense, self).load_options(args)
         if self.options.isp_db:
-            self.isp_lookup = GeoIP.open(
-                self.options.isp_db, GeoIP.GEOIP_STANDARD)
+            self.isp_lookup = pygeoip.GeoIP(
+                self.options.isp_db, pygeoip.MEMORY_CACHE)
 
     def mapper(self, _, line):
         '''

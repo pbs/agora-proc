@@ -9,7 +9,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-requires = open('requirements.txt').read().split()
+requires = open('requirements/requirements.txt').read().split()
 
 setup(
     name='agora',

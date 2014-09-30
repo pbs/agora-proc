@@ -1,3 +1,5 @@
+import socket
+
 from dateutil.parser import parse
 
 
@@ -160,7 +162,11 @@ class PBSVideoStats(object):
         r['user_bitrate_events'] = self.user_bitrate_events
         r['isp_name'] = None
         if self.client_id and self.isp_lookup:
-            r['isp_name'] = self.isp_lookup.org_by_addr(self.client_id)
+            try:
+                r['isp_name'] = self.isp_lookup.org_by_addr(self.client_id)
+            except socket.error:
+                # TODO: logging
+                print 'BAD IP: %s' % self.client_id
         return r
 
     def _contains_bad_data(self, event):
