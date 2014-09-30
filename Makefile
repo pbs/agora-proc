@@ -1,5 +1,5 @@
 init:
-	pip install -r requirements.txt
+	pip install -r requirements/requirements.txt
 
 flake:
 	flake8 .
@@ -13,7 +13,7 @@ clean:
 	find . -name "*.swp" -print0 | xargs -0 rm -f
 
 tar: clean
-	tar -czf agora.tar.gz readme.md setup.py setup.cfg MANIFEST.in requirements.txt ./agora
+	tar -czf agora.tar.gz readme.md setup.py setup.cfg MANIFEST.in requirements/requirements.txt ./agora
 
 test:
 	py.test --capture=no

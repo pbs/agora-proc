@@ -1,3 +1,5 @@
+import socket
+
 from dateutil.parser import parse
 
 
@@ -8,7 +10,7 @@ class PBSVideoStats(object):
     MEDIA_ENDED_EVENTS = ['MediaEnded', 'MediaCompleted']
     MEDIA_EVENTS = MEDIA_START_EVENTS + MEDIA_ENDED_EVENTS
 
-    def __init__(self):
+    def __init__(self, isp_lookup=None):
 
         # Ids used to differentiate videos
         self.tracking_id = None
@@ -27,8 +29,7 @@ class PBSVideoStats(object):
         self.first_event_type = None
         self.last_event_type = None
 
-        # Tracks amount of buffering and 
-        # Amount of video played
+        # Tracks amount of buffering and amount of video played
         self.buffer_start_events = 0
         self.playing_duration = 0
 
@@ -55,6 +56,8 @@ class PBSVideoStats(object):
         # Keeps track of buffering length of stream
         self.buffering_length = 0
         self.initial_buffering_length = 0
+
+        self.isp_lookup = isp_lookup
 
     def add_event(self, event):
         '''
@@ -157,6 +160,13 @@ class PBSVideoStats(object):
         r['initial_buffering_length'] = self.initial_buffering_length
         r['auto_bitrate_events'] = self.auto_bitrate_events
         r['user_bitrate_events'] = self.user_bitrate_events
+        r['isp_name'] = None
+        if self.client_id and self.isp_lookup:
+            try:
+                r['isp_name'] = self.isp_lookup.org_by_addr(self.client_id)
+            except socket.error:
+                # TODO: logging
+                print 'BAD IP: %s' % self.client_id
         return r
 
     def _contains_bad_data(self, event):

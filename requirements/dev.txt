@@ -1,0 +1,5 @@
+autopep8==1.0.3
+flake8==2.2.0
+pytest-cov==1.6
+pytest==2.5.2
+tox==1.7.1
