@@ -12,12 +12,14 @@
             "s3_scratch_uri": "s3://bucket/key/jobs/",
             "max_hours_idle" : "0",
             "mins_to_end_of_hour" : "10",
-	    ec2_instance_type: c1.medium,
-	    num_ec2_instances: <number>,
-            "bootstrap_cmds": [
+            ec2_instance_type: c1.medium,
+            num_ec2_instances: <number>,
+            "upload_archives": ['agora.tar.gz'],
+            "bootstrap": [
                 "sudo easy_install pip",
-                "sudo pip install python-dateutil",
-                "sudo pip install --upgrade simplejson"
+            ],
+            "setup": [
+                "sudo pip install ./agora.tar.gz/"
             ]
         }
     }
