@@ -10,7 +10,7 @@ class PBSVideoStats(object):
     MEDIA_ENDED_EVENTS = ['MediaEnded', 'MediaCompleted']
     MEDIA_EVENTS = MEDIA_START_EVENTS + MEDIA_ENDED_EVENTS
 
-    def __init__(self, isp_lookup=None):
+    def __init__(self, isp_lookup=None, geo_lookup=None):
 
         # Ids used to differentiate videos
         self.tracking_id = None
@@ -58,6 +58,7 @@ class PBSVideoStats(object):
         self.initial_buffering_length = 0
 
         self.isp_lookup = isp_lookup
+        self.geo_lookup = geo_lookup
 
     def add_event(self, event):
         '''
@@ -164,6 +165,26 @@ class PBSVideoStats(object):
         if self.client_id and self.isp_lookup:
             try:
                 r['isp_name'] = self.isp_lookup.org_by_addr(self.client_id)
+            except socket.error:
+                # TODO: logging
+                print 'BAD IP: %s' % self.client_id
+        r['geo_city'] = None
+        r['geo_longitude'] = None
+        r['geo_latitude'] = None
+        r['geo_postal_code'] = None
+        r['geo_metro_code'] = None
+        r['geo_country_code'] = None
+        r['geo_country_name'] = None
+        if self.client_id and self.geo_lookup:
+            try:
+                geo_record = self.geo_lookup.record_by_addr(self.client_id)
+                r['geo_city'] = geo_record.get('city')
+                r['geo_longitude'] = geo_record.get('longitude')
+                r['geo_latitude'] = geo_record.get('latitude')
+                r['geo_postal_code'] = geo_record.get('postal_code')
+                r['geo_metro_code'] = geo_record.get('metro_code')
+                r['geo_country_code'] = geo_record.get('country_code')
+                r['geo_country_name'] = geo_record.get('country_name')
             except socket.error:
                 # TODO: logging
                 print 'BAD IP: %s' % self.client_id
