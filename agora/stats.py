@@ -176,7 +176,12 @@ class PBSVideoStats(object):
         r['geo_country_code'] = None
         r['geo_country_name'] = None
         if self.client_id and self.geo_lookup:
-            geo_record = self.geo_lookup.record_by_addr(self.client_id)
+            try:
+                geo_record = self.geo_lookup.record_by_addr(self.client_id)
+            except socket.error:
+                geo_record = None
+                # TODO: logging
+                print 'BAD IP: %s' % self.client_id
             if geo_record:
                 r['geo_city'] = geo_record.get('city')
                 r['geo_longitude'] = geo_record.get('longitude')
