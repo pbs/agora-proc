@@ -178,6 +178,11 @@ class PBSVideoStats(object):
         if self.client_id and self.geo_lookup:
             try:
                 geo_record = self.geo_lookup.record_by_addr(self.client_id)
+            except socket.error:
+                geo_record = None
+                # TODO: logging
+                print 'BAD IP: %s' % self.client_id
+            if geo_record:
                 r['geo_city'] = geo_record.get('city')
                 r['geo_longitude'] = geo_record.get('longitude')
                 r['geo_latitude'] = geo_record.get('latitude')
@@ -185,9 +190,6 @@ class PBSVideoStats(object):
                 r['geo_metro_code'] = geo_record.get('metro_code')
                 r['geo_country_code'] = geo_record.get('country_code')
                 r['geo_country_name'] = geo_record.get('country_name')
-            except socket.error:
-                # TODO: logging
-                print 'BAD IP: %s' % self.client_id
         return r
 
     def _contains_bad_data(self, event):
