@@ -40,6 +40,7 @@ class PBSVideoStats(object):
         self.title = None
         self.session_id = None
         self.user_agent = None
+        self.video_length = None
         self.position_earliest_play = None
         self.position_latest_play = None
         self.duration_events = []
@@ -83,6 +84,8 @@ class PBSVideoStats(object):
             self.session_id = event['x_session_id']
         if not self.user_agent and event.get('x_user_agent'):
             self.user_agent = event['x_user_agent']
+        if not self.video_length and event.get('x_video_length'):
+            self.video_length = event['x_video_length']
 
         # Skip event if it contains bad data
         if self._contains_bad_data(event):
@@ -155,6 +158,7 @@ class PBSVideoStats(object):
         r['client_id'] = self.client_id
         r['title'] = self.title
         r['session_id'] = self.session_id
+        r['video_length'] = self.video_length
         r['position_earliest_play'] = self.position_earliest_play
         r['buffering_events'] = self.buffering_events
         r['buffering_length'] = self.buffering_length
