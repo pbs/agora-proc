@@ -195,3 +195,23 @@ class PBSVideoStatsTestcase(unittest.TestCase):
             results = stats.summary()
             self.assertEqual(
                 results.get('user_bitrate_events'), user_bitrate_events)
+
+    def test_x_video_length(self):
+        """
+        Test that the video length is reported throughout the stream
+        and that we're capturing it accurately
+        """
+        streams_with_video_length = 0
+        for key, events in self.events.items():
+            stats = PBSVideoStats()
+            stream_video_length = None
+            for event in events:
+                stats.add_event(event)
+                if event.get('x_video_length'):
+                    stream_video_length = event.get('x_video_length')
+            results = stats.summary()
+            self.assertEqual(
+                results.get('video_length'), stream_video_length)
+            if stream_video_length is not None:
+                streams_with_video_length += 1
+        self.assertTrue(streams_with_video_length > 0)
