@@ -1,10 +1,10 @@
-import unittest
 import copy
+import unittest
 from os import path
 
-from mrjob.protocol import JSONProtocol
-
 from agora.stats import PBSVideoStats
+from dateutil.parser import parse
+from mrjob.protocol import JSONProtocol
 
 HERE = path.abspath(path.dirname(__file__))
 
@@ -196,22 +196,57 @@ class PBSVideoStatsTestcase(unittest.TestCase):
             self.assertEqual(
                 results.get('user_bitrate_events'), user_bitrate_events)
 
-    def test_x_video_length(self):
+    def test_buffering_length(self):
         """
-        Test that the video length is reported throughout the stream
-        and that we're capturing it accurately
+        Verify that we're summing the time a stream spends buffering.
         """
-        streams_with_video_length = 0
+        streams_with_buffer_length = 0
+        enum = -1
         for key, events in self.events.items():
+            enum += 1
             stats = PBSVideoStats()
-            stream_video_length = None
+            stream_buffer_length = None
+            open_start_buffer = False
+            is_valid_buffering = True
+            media_buffering_start_time = None
+            media_buffering_start_location = None
             for event in events:
                 stats.add_event(event)
-                if event.get('x_video_length'):
-                    stream_video_length = event.get('x_video_length')
-            results = stats.summary()
-            self.assertEqual(
-                results.get('video_length'), stream_video_length)
-            if stream_video_length is not None:
-                streams_with_video_length += 1
-        self.assertTrue(streams_with_video_length > 0)
+                event_type = event.get('event_type')
+                if not event_type:
+                    is_valid_buffering = False
+                    break
+                if event_type == 'MediaBufferingStart':
+                    if open_start_buffer:
+                        # two MediaBufferingStart events in a row
+                        # toss stream
+                        is_valid_buffering = False
+                        break
+                    open_start_buffer = True
+                    media_buffering_start_time = parse(event.get('event_date'))
+                    media_buffering_start_location = event.get('x_video_location')
+                if event_type == 'MediaBufferingEnd':
+                    if not open_start_buffer:
+                        # two MediaBufferingEnd events in a row
+                        # toss stream
+                        is_valid_buffering = False
+                        break
+                    open_start_buffer = False
+                    # verify that we didn't scrub video
+                    if event.get('x_video_location') != media_buffering_start_location:
+                        is_valid_buffering = False
+                        break
+                    # subtract MediaBufferingEnd timestamp from
+                    # MediaBufferingStart timestamp
+                    if not stream_buffer_length:
+                        stream_buffer_length = 0
+                    media_buffering_end_time = parse(event.get('event_date'))
+                    buffer_delta = media_buffering_end_time - media_buffering_start_time
+                    stream_buffer_length += buffer_delta.total_seconds()
+            if is_valid_buffering:
+                results = stats.summary()
+                self.assertEqual(
+                    results.get('buffering_length'), stream_buffer_length)
+                if stream_buffer_length is not None:
+                    streams_with_buffer_length += 1
+        self.assertTrue(streams_with_buffer_length > 0)
