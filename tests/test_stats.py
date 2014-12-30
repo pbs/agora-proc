@@ -245,9 +245,12 @@ class PBSVideoStatsTestcase(unittest.TestCase):
                     stream_buffer_length += self._total_seconds(buffer_delta)
             if is_valid_buffering:
                 results = stats.summary()
-                self.assertEqual(
-                    results.get('buffering_length'), stream_buffer_length)
+                results_buffering_length = results.get('buffering_length')
+                self.assertEqual(results_buffering_length, stream_buffer_length)
                 if stream_buffer_length is not None:
+                    self.assertTrue(
+                        results_buffering_length >= 0,
+                        '%s is not a positive number' % results_buffering_length)
                     streams_with_buffer_length += 1
         self.assertTrue(streams_with_buffer_length > 0)
 
