@@ -328,7 +328,8 @@ class PBSVideoStats(object):
             # we scrubbed during buffering, disregard buffering data
             self._invalidate_buffer_results()
             return
-        # subtract MediaBufferingEnd timestamp from MediaBufferingStart timestamp
+        # subtract MediaBufferingEnd timestamp from 
+        # MediaBufferingStart timestamp
         if not self.buffering_length:
             self.buffering_length = 0
         try:
@@ -338,8 +339,13 @@ class PBSVideoStats(object):
             # can't parse event_date, can't calculate buffer length
             self._invalidate_buffer_results()
             return
+        if media_buffering_end_time < self._buffering_start_time:
+            # the MediaBufferingEnd event has a timestamp before its
+            # MediaBufferingStart event: bad data
+            self._invalidate_buffer_results()
+            return
         buffer_delta = media_buffering_end_time - self._buffering_start_time
-        self.buffering_length += buffer_delta.total_seconds()
+        self.buffering_length += self._total_seconds(buffer_delta)
         if event.get('x_video_location'):
             loc = event['x_video_location']
             self.buffering_positions.append(loc)

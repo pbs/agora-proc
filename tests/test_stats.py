@@ -242,11 +242,23 @@ class PBSVideoStatsTestcase(unittest.TestCase):
                         stream_buffer_length = 0
                     media_buffering_end_time = parse(event.get('event_date'))
                     buffer_delta = media_buffering_end_time - media_buffering_start_time
-                    stream_buffer_length += buffer_delta.total_seconds()
+                    stream_buffer_length += self._total_seconds(buffer_delta)
             if is_valid_buffering:
                 results = stats.summary()
-                self.assertEqual(
-                    results.get('buffering_length'), stream_buffer_length)
+                results_buffering_length = results.get('buffering_length')
+                self.assertEqual(results_buffering_length, stream_buffer_length)
                 if stream_buffer_length is not None:
+                    self.assertTrue(
+                        results_buffering_length >= 0,
+                        '%s is not a positive number' % results_buffering_length)
                     streams_with_buffer_length += 1
         self.assertTrue(streams_with_buffer_length > 0)
+
+    def _total_seconds(self, timedelta):
+        """
+        Replacement for timedelta.total_seconds() which
+        is not supported in python 2.6
+        """
+        delta_seconds = timedelta.days * 24 * 3600
+        delta_microseconds = (timedelta.seconds + delta_seconds) * 10 ** 6
+        return (timedelta.microseconds + delta_microseconds) / 10 ** 6

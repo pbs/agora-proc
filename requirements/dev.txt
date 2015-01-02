@@ -4,4 +4,4 @@ ipdb
 ipython
 pytest-cov==1.6
 pytest==2.5.2
-tox==1.7.1
+tox
