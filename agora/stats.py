@@ -1,6 +1,5 @@
 import socket
-
-from dateutil.parser import parse
+from datetime import datetime
 
 
 class PBSVideoStats(object):
@@ -40,6 +39,7 @@ class PBSVideoStats(object):
         self.title = None
         self.session_id = None
         self.user_agent = None
+        self.video_length = None
         self.position_earliest_play = None
         self.position_latest_play = None
         self.duration_events = []
@@ -54,7 +54,12 @@ class PBSVideoStats(object):
         self.buffering_events = 0
 
         # Keeps track of buffering length of stream
-        self.buffering_length = 0
+        self.buffering_length = None
+        # flag a stream that has unordered buffering events
+        # or has scrubbed during buffering
+        self._valid_buffering_length = True
+        self.is_buffering = False
+        self._buffering_start_time = None
         self.initial_buffering_length = 0
 
         self.isp_lookup = isp_lookup
@@ -83,6 +88,8 @@ class PBSVideoStats(object):
             self.session_id = event['x_session_id']
         if not self.user_agent and event.get('x_user_agent'):
             self.user_agent = event['x_user_agent']
+        if not self.video_length and event.get('x_video_length'):
+            self.video_length = event['x_video_length']
 
         # Skip event if it contains bad data
         if self._contains_bad_data(event):
@@ -90,7 +97,7 @@ class PBSVideoStats(object):
 
         # calc earliest and latest date of event
         if event.get('event_date'):
-            edate = parse(event['event_date'])
+            edate = datetime.strptime(event['event_date'], '%Y-%m-%d %H:%M:%S')
             if self.earliest_time and (edate < self.earliest_time):
                 self.earliest_time = edate
                 self.first_event_type = event.get('event_type', None)
@@ -155,6 +162,7 @@ class PBSVideoStats(object):
         r['client_id'] = self.client_id
         r['title'] = self.title
         r['session_id'] = self.session_id
+        r['video_length'] = self.video_length
         r['position_earliest_play'] = self.position_earliest_play
         r['buffering_events'] = self.buffering_events
         r['buffering_length'] = self.buffering_length
@@ -266,22 +274,81 @@ class PBSVideoStats(object):
                     True: loc, False: self.position_latest_play}
                 [self.position_latest_play < loc]
 
+    def _invalidate_buffer_results(self):
+        """
+        Indicate that we can't caluclate buffering stats.
+        """
+        self._valid_buffering_length = False
+        self._clear_buffering_results()
+
+    def _clear_buffering_results(self):
+        """
+        Set buffering results to a "N/A" state.
+        """
+        self.buffering_length = None
+        self.buffering_positions = None
+
     def _addEventMediaBufferingStart(self, event):
         self.buffer_start_events += 1
+        if not self._valid_buffering_length:
+            return
+        if self.is_buffering:
+            # two MediaBufferingStart events in a row
+            # toss stream
+            self._invalidate_buffer_results()
+            return
+        self.is_buffering = True
+        try:
+            self._buffering_start_time = datetime.strptime(
+                event['event_date'], '%Y-%m-%d %H:%M:%S')
+        except (ValueError, TypeError):
+            # can't parse event_date, can't calculate buffer length
+            self._invalidate_buffer_results()
+            return
+        self._video_location_check = event.get('x_video_location')
 
     def _addEventMediaBufferingEnd(self, event):
         if event.get('x_after_seek') == 'False':
             # only count buffering when not seeking
             return
         self.buffering_events += 1
-        self.buffering_length += int(event.get('x_buffering_length', 0))
-        if event.get('x_video_location'):
-            loc = event['x_video_location']
-            self.buffering_positions.append(loc)
-
         if event.get('x_auto'):
             if event['x_auto'] == 'true':
                 self.auto_bitrate = True
+        # calculate buffering data
+        if not self._valid_buffering_length:
+            return
+        if not self.is_buffering:
+            # two MediaBufferingEnd events in a row
+            # toss stream
+            self._invalidate_buffer_results()
+            return
+        self.is_buffering = False
+        if event.get('x_video_location') != self._video_location_check:
+            # we scrubbed during buffering, disregard buffering data
+            self._invalidate_buffer_results()
+            return
+        # subtract MediaBufferingEnd timestamp from 
+        # MediaBufferingStart timestamp
+        if not self.buffering_length:
+            self.buffering_length = 0
+        try:
+            media_buffering_end_time = datetime.strptime(
+                event['event_date'], '%Y-%m-%d %H:%M:%S')
+        except (ValueError, TypeError):
+            # can't parse event_date, can't calculate buffer length
+            self._invalidate_buffer_results()
+            return
+        if media_buffering_end_time < self._buffering_start_time:
+            # the MediaBufferingEnd event has a timestamp before its
+            # MediaBufferingStart event: bad data
+            self._invalidate_buffer_results()
+            return
+        buffer_delta = media_buffering_end_time - self._buffering_start_time
+        self.buffering_length += self._total_seconds(buffer_delta)
+        if event.get('x_video_location'):
+            loc = event['x_video_location']
+            self.buffering_positions.append(loc)
 
     def _addEventMediaInitalBufferEnd(self, event):
         self.initial_buffering_length += int(event.get('x_buffering_length', 0))

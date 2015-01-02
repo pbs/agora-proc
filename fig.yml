@@ -1,0 +1,5 @@
+task:
+  build: .
+  command: tox
+  volumes:
+    - .:/code
