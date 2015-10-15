@@ -42,7 +42,7 @@ class VideoStreamCondense(MRJob):
         Takes a goonhilly line and parses all the fields to a dictionary
         '''
         self.increment_counter('job-metrics', 'total-events', 1)
-        parsed_line = GoonHillyLog.parse_log_line(line)
+        parsed_line = GoonHillyLog.parse_log_line_json(line)
         if not parsed_line:
             self.logger.debug(
                 'agora.logs.GoonHillyLog: Unable to parse line: ' + line)

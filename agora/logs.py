@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re
+import re, json
 from dateutil.parser import parse
 
 
@@ -58,3 +58,33 @@ class GoonHillyLog(object):
         if d.get('x_session_id'):
             d['x_session_id'] = d['x_session_id'].lower()
         return d
+
+    @staticmethod
+    def parse_log_line_json(line):
+        '''
+        Parses a goonhilly fluentd json formatted log line and returns a
+        dictionary of key value objects
+        '''
+        # pull in a line of json to a dict or bail
+        try:
+            event = json.loads(line)
+        except:
+            return None
+        # attempt to get a valid date and format it properly. If no valid date, bail
+        try:
+            dateutil_event_date = parse(event["time"])
+            event["event_date"] = dateutil_event_date.strftime("%Y-%m-%d %H:%M:%S")
+        except:
+            # invalid date, skip the line
+            # print 'skipping line'
+            return None
+
+        # remove double quotes or single quotes from around values
+        for k, v in event.iteritems():
+            if v.startswith('"') and v.endswith('"'):
+                event[k] = event[k][1:-1]
+
+        # special transforms
+        if event.get('x_session_id'):
+            event['x_session_id'] = event['x_session_id'].lower()
+        return event
