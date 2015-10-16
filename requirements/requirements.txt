@@ -1,4 +1,4 @@
-boto==2.17.0
+boto==2.38.0
 pygeoip==0.3.1
 mrjob==0.4.4
 python-dateutil==2.2

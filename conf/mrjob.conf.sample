@@ -3,24 +3,25 @@
         "emr" : {
             "aws_region" : "us-east-1",
             "aws_access_key_id": "<Key>",
-            "aws_secret_access_key": "<secret>",
-            "visible_to_all_users" : True,
+            "aws_secret_access_key": "<Secret>",
+            "visible_to_all_users" : "True",
             "ec2_key_pair": "EMR",
             "ec2_key_pair_file": "path/to/file/EMR.pem",
-            "ssh_tunnel_to_job_tracker": true,
+            "ssh_tunnel_to_job_tracker": "False",
             "s3_log_uri" : "s3://bucket/key/jobs/logs/",
             "s3_scratch_uri": "s3://bucket/key/jobs/",
-            "max_hours_idle" : "0",
+            "max_hours_idle" : "1",
             "mins_to_end_of_hour" : "10",
-            ec2_instance_type: c1.medium,
-            num_ec2_instances: <number>,
-            "upload_archives": ['agora.tar.gz'],
+            "ec2_master_instance_type" : "c1.medium",
+            "ec2_instance_type" : "c3.xlarge",
+            "num_ec2_instances" : 4,
+            "iam_instance_profile" : "EMR_EC2_DefaultRole",
+            "iam_service_role" : "EMR_DefaultRole",
+            "upload_archives": ["agora.tar.gz"],
             "bootstrap": [
-                "sudo easy_install pip",
+                "sudo easy_install pip"
             ],
-            "setup": [
-                "sudo pip install ./agora.tar.gz/"
-            ]
+            "setup": ["sudo pip install ./agora.tar.gz/"]
         }
     }
 }
