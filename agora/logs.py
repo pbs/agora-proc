@@ -81,7 +81,7 @@ class GoonHillyLog(object):
 
         # remove double quotes or single quotes from around values
         for k, v in event.iteritems():
-            if v.startswith('"') and v.endswith('"'):
+            if isinstance(v, str) and v.startswith('"') and v.endswith('"'):
                 event[k] = event[k][1:-1]
 
         # special transforms
