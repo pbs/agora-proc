@@ -1,8 +1,9 @@
 Agora
 =====
 
-Agora is a batch analyzer of video stream logs. It heavily uses Amazon Web Services and is built using the open-source mrjob python module. It leverages AWS EMR to parallelize
-the processing of client video player events.
+Agora is a batch analyzer of video stream logs. It heavily uses Amazon Web
+Services and is built using the open-source mrjob python module. It leverages
+AWS EMR to parallelize the processing of client video player events.
 
 Installation
 ------------
@@ -13,7 +14,9 @@ python setup.py install
 
 Configuration
 -------------
-Before running Agora, you need to set up a configuration file to provide your AWS access keys and other information so that the mrjob module can access and pull down your log files to be processed. 
+Before running Agora, you need to set up a configuration file to provide your AWS
+access keys and other information so that the mrjob module can access and pull
+down your log files to be processed. 
 
 Usage
 -----

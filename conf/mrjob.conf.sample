@@ -21,7 +21,7 @@
             "bootstrap": [
                 "sudo easy_install pip"
             ],
-            "setup": ["sudo pip install ./agora.tar.gz/"]
+            "setup": ["sudo pip-2.7 install ./agora.tar.gz/"]
         }
     }
 }
