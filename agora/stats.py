@@ -76,8 +76,8 @@ class PBSVideoStats(object):
 
         # TODO: check if current event's values are the same
         # set the following values only once per event
-        if not self.source and event.get('source_tag'):
-            self.source = event['source_tag']
+        if not self.source and event.get('path'):
+            self.source = self._parse_source_from_path(event['path'])
         if not self.component and event.get('component'):
             self.component = event['component']
         if not self.client_id and event.get('remote'):
@@ -403,3 +403,11 @@ class PBSVideoStats(object):
         delta_seconds = timedelta.days * 24 * 3600
         delta_microseconds = (timedelta.seconds + delta_seconds) * 10 ** 6
         return (timedelta.microseconds + delta_microseconds) / 10 ** 6
+
+    def _parse_source_from_path(self, path):
+        path_list = path.split('/')
+        if len(path_list) >= 2:
+            source = path_list[2]
+        else:
+            source = None
+        return source
