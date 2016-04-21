@@ -80,8 +80,8 @@ class PBSVideoStats(object):
             self.source = event['source_tag']
         if not self.component and event.get('component'):
             self.component = event['component']
-        if not self.client_id and event.get('client_id'):
-            self.client_id = event['client_id']
+        if not self.client_id and event.get('remote'):
+            self.client_id = event['remote']
         if not self.title and event.get('x_episode_title'):
             self.title = event['x_episode_title']
         if not self.session_id and event.get('x_session_id'):
@@ -159,7 +159,6 @@ class PBSVideoStats(object):
         r['source'] = self.source
         r['component'] = self.component
         r['auto_bitrate'] = self.auto_bitrate
-        r['client_id'] = self.client_id
         r['title'] = self.title
         r['session_id'] = self.session_id
         r['video_length'] = self.video_length
