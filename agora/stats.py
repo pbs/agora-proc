@@ -86,8 +86,8 @@ class PBSVideoStats(object):
             self.title = event['x_episode_title']
         if not self.session_id and event.get('x_session_id'):
             self.session_id = event['x_session_id']
-        if not self.user_agent and event.get('x_user_agent'):
-            self.user_agent = event['x_user_agent']
+        if not self.user_agent and event.get('agent'):
+            self.user_agent = event['agent']
         if not self.video_length and event.get('x_video_length'):
             self.video_length = event['x_video_length']
 
@@ -157,6 +157,7 @@ class PBSVideoStats(object):
         r['buffer_start_events'] = self.buffer_start_events
         r['playing_duration'] = self._calculate_duration()
         r['source'] = self.source
+        r['user_agent'] = self.user_agent
         r['component'] = self.component
         r['auto_bitrate'] = self.auto_bitrate
         r['title'] = self.title
