@@ -3,6 +3,6 @@ filechunkio==1.6
 mrjob==0.5.0
 pygeoip==0.3.1
 python-dateutil==2.2
-PyYAML==3.11
+PyYAML==5.4
 simplejson==3.8.2
 six==1.10.0
